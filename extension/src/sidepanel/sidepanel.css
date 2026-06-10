@@ -19,25 +19,10 @@ textarea {
 }
 
 .shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   padding: 16px;
-}
-
-.header {
-  margin-bottom: 12px;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.composer {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
 }
 
 textarea {
@@ -50,23 +35,11 @@ textarea {
   background: #ffffff;
 }
 
-.composer button {
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 12px;
-  color: #ffffff;
-  background: #1f7a5a;
-  cursor: pointer;
-}
-
 .list {
+  flex: 1;
   display: grid;
   gap: 10px;
+  align-content: start;
 }
 
 .snippet {
@@ -85,25 +58,88 @@ textarea {
   line-height: 1.5;
 }
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
+.empty {
+  margin: 32px 0 0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
-.actions button {
+/* ── bottom add button ── */
+
+.fab {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+}
+
+.fab button {
   display: inline-grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: 1px solid #d7dce3;
-  border-radius: 8px;
-  color: #334155;
+  border-radius: 50%;
+  color: #94a3b8;
   background: #ffffff;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.fab button:hover {
+  color: #334155;
+  border-color: #94a3b8;
+}
+
+/* ── dialog ── */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.3);
+  z-index: 100;
+}
+
+.dialog {
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  display: grid;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.12);
+}
+
+.dialog-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialog-actions button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 16px;
   cursor: pointer;
 }
 
-.edit {
-  display: grid;
-  gap: 8px;
+.dialog-actions button:first-child {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.dialog-actions button:last-child {
+  color: #ffffff;
+  background: #1f7a5a;
 }

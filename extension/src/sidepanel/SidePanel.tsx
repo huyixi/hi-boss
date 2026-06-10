@@ -1,14 +1,14 @@
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { addSnippet, deleteSnippet, getSnippets, updateSnippet } from '../shared/storage'
+import { Plus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { addSnippet, getSnippets } from '../shared/storage'
 import type { InsertSnippetMessage, InsertSnippetResponse, Snippet } from '../shared/types'
 import './sidepanel.css'
 
 export const SidePanel = () => {
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [draft, setDraft] = useState('')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingContent, setEditingContent] = useState('')
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const reloadSnippets = async () => {
     setSnippets(await getSnippets())
@@ -18,30 +18,25 @@ export const SidePanel = () => {
     void reloadSnippets()
   }, [])
 
+  useEffect(() => {
+    if (dialogOpen) {
+      textareaRef.current?.focus()
+    }
+  }, [dialogOpen])
+
   const handleAdd = async () => {
     if (!draft.trim()) return
     await addSnippet(draft)
     setDraft('')
+    setDialogOpen(false)
     await reloadSnippets()
   }
 
-  const beginEdit = (snippet: Snippet) => {
-    setEditingId(snippet.id)
-    setEditingContent(snippet.content)
-  }
-
-  const saveEdit = async () => {
-    if (!editingId || !editingContent.trim()) return
-    await updateSnippet(editingId, editingContent)
-    setEditingId(null)
-    setEditingContent('')
-    await reloadSnippets()
-  }
-
-  const removeSnippet = async (id: string) => {
-    if (!window.confirm('确认删除这条话术？')) return
-    await deleteSnippet(id)
-    await reloadSnippets()
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault()
+      void handleAdd()
+    }
   }
 
   const insertSnippet = async (content: string) => {
@@ -63,64 +58,49 @@ export const SidePanel = () => {
 
   return (
     <main className="shell">
-      <header className="header">
-        <h1>快捷话术</h1>
-      </header>
-
-      <section className="composer" aria-label="新增话术">
-        <textarea
-          aria-label="新增话术内容"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          rows={4}
-        />
-        <button type="button" onClick={handleAdd} aria-label="新增话术">
-          <Plus size={16} />
-          新增
-        </button>
-      </section>
-
       <section className="list" aria-label="话术列表">
-        {snippets.map((snippet, index) => (
-          <article
-            key={snippet.id}
-            data-testid="snippet-card"
-            className="snippet"
-            onClick={() => void insertSnippet(snippet.content)}
-          >
-            {editingId === snippet.id ? (
-              <div className="edit" onClick={(event) => event.stopPropagation()}>
-                <textarea
-                  aria-label="编辑话术内容"
-                  value={editingContent}
-                  onChange={(event) => setEditingContent(event.target.value)}
-                  rows={5}
-                />
-                <div className="actions">
-                  <button type="button" onClick={saveEdit} aria-label="保存话术">
-                    <Check size={16} />
-                  </button>
-                  <button type="button" onClick={() => setEditingId(null)} aria-label="取消编辑">
-                    <X size={16} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <p>{snippet.content}</p>
-                <div className="actions" onClick={(event) => event.stopPropagation()}>
-                  <button type="button" onClick={() => beginEdit(snippet)} aria-label={`编辑话术 ${index + 1}`}>
-                    <Pencil size={16} />
-                  </button>
-                  <button type="button" onClick={() => void removeSnippet(snippet.id)} aria-label={`删除话术 ${index + 1}`}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </>
-            )}
-          </article>
-        ))}
+        {snippets.length === 0 ? (
+          <p className="empty">暂无话术，点击下方按钮新增</p>
+        ) : (
+          snippets.map((snippet) => (
+            <article
+              key={snippet.id}
+              data-testid="snippet-card"
+              className="snippet"
+              onClick={() => void insertSnippet(snippet.content)}
+            >
+              <p>{snippet.content}</p>
+            </article>
+          ))
+        )}
       </section>
+
+      <footer className="fab">
+        <button type="button" onClick={() => { setDraft(''); setDialogOpen(true) }} aria-label="新增话术" title="新增话术">
+          <Plus size={16} />
+        </button>
+      </footer>
+
+      {dialogOpen && (
+        <div className="dialog-backdrop" onClick={() => setDialogOpen(false)}>
+          <div className="dialog" onClick={(event) => event.stopPropagation()}>
+            <textarea
+              ref={textareaRef}
+              aria-label="新增话术内容"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="输入话术内容"
+              rows={5}
+            />
+            <p className="dialog-hint">Cmd/Ctrl + Enter 快速新增</p>
+            <div className="dialog-actions">
+              <button type="button" onClick={() => setDialogOpen(false)}>取消</button>
+              <button type="button" onClick={handleAdd}>新增</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
