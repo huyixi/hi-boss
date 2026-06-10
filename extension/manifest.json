@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "招聘平台快捷话术",
+  "name": "hi-boss",
   "version": "0.1.0",
   "description": "在招聘平台聊天页快速插入本地快捷话术。",
   "permissions": ["storage", "sidePanel", "activeTab", "clipboardWrite"],
@@ -12,7 +12,7 @@
     "*://*.liepin.com/*"
   ],
   "action": {
-    "default_title": "快捷话术"
+    "default_title": "hi-boss"
   },
   "background": {
     "service_worker": "assets/background.js",
