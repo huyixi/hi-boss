@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "招聘平台快捷话术",
+  "version": "0.1.0",
+  "description": "在招聘平台聊天页快速插入本地快捷话术。",
+  "permissions": ["storage", "sidePanel", "activeTab", "clipboardWrite"],
+  "host_permissions": [
+    "*://*.zhipin.com/*",
+    "*://*.lagou.com/*",
+    "*://*.zhaopin.com/*",
+    "*://*.51job.com/*",
+    "*://*.liepin.com/*"
+  ],
+  "action": {
+    "default_title": "快捷话术"
+  },
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.zhipin.com/*",
+        "*://*.lagou.com/*",
+        "*://*.zhaopin.com/*",
+        "*://*.51job.com/*",
+        "*://*.liepin.com/*"
+      ],
+      "js": ["assets/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
