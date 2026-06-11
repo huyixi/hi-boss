@@ -1,4 +1,7 @@
+import { startCompression } from './compress'
 import { insertSnippetText } from './insert'
+
+startCompression()
 import type { InsertSnippetMessage, InsertSnippetResponse } from '../shared/types'
 
 chrome.runtime.onMessage.addListener(
